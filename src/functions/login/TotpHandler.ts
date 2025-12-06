@@ -1,6 +1,7 @@
 import type { Locator, Page } from 'playwright'
 import readline from 'readline'
 import { MicrosoftRewardsBot } from '../../index'
+import { HumanTyping } from '../../util/browser/HumanTyping'
 import { logError } from '../../util/notifications/Logger'
 import { generateTOTP } from '../../util/security/Totp'
 
@@ -190,8 +191,8 @@ export class TotpHandler {
                 return
             }
 
-            // Fill code and submit
-            await page.fill('input[name="otc"]', code)
+            // FIXED: Use HumanTyping instead of .fill() to avoid bot detection
+            await HumanTyping.typeTotp(page.locator('input[name="otc"]'), code)
             await page.keyboard.press('Enter')
             this.bot.log(this.bot.isMobile, 'LOGIN', '2FA code submitted')
         } catch (error) {
@@ -248,8 +249,8 @@ export class TotpHandler {
                 this.bot.log(this.bot.isMobile, 'LOGIN', 'TOTP input unexpectedly hidden', 'warn')
                 return
             }
-            await input.fill('')
-            await input.fill(code)
+            // FIXED: Use HumanTyping instead of .fill() to avoid bot detection
+            await HumanTyping.typeTotp(input, code)
             // Use unified selector system
             const submit = await this.findFirstVisibleLocator(page, TotpHandler.TOTP_SELECTORS.submit)
             if (submit) {

@@ -4,6 +4,7 @@ import type { Page } from 'playwright'
 
 import { MicrosoftRewardsBot } from '../index'
 import { OAuth } from '../interface/OAuth'
+import { HumanTyping } from '../util/browser/HumanTyping'
 import { waitForElementSmart, waitForPageReady } from '../util/browser/SmartWait'
 import { Retry } from '../util/core/Retry'
 import { logError } from '../util/notifications/Logger'
@@ -622,8 +623,8 @@ export class Login {
         })
 
         if (!prefilledResult.found) {
-            await page.fill(SELECTORS.emailInput, '')
-            await page.fill(SELECTORS.emailInput, email)
+            // FIXED: Use HumanTyping instead of .fill() to avoid bot detection
+            await HumanTyping.typeEmail(page.locator(SELECTORS.emailInput), email)
         } else {
             this.bot.log(this.bot.isMobile, 'LOGIN', 'Email prefilled')
         }
@@ -684,8 +685,8 @@ export class Login {
         const blocked = await this.securityDetector.detectSignInBlocked(page)
         if (blocked) return
 
-        await page.fill(SELECTORS.passwordInput, '')
-        await page.fill(SELECTORS.passwordInput, password)
+        // FIXED: Use HumanTyping instead of .fill() to avoid bot detection
+        await HumanTyping.typePassword(page.locator(SELECTORS.passwordInput), password)
 
         const submitResult = await waitForElementSmart(page, SELECTORS.submitBtn, {
             initialTimeoutMs: 500,

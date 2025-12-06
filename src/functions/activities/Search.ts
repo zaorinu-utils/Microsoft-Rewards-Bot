@@ -6,6 +6,7 @@ import { Workers } from '../Workers'
 import { AxiosRequestConfig } from 'axios'
 import { Counters, DashboardData } from '../../interface/DashboardData'
 import { GoogleSearch } from '../../interface/Search'
+import { HumanTyping } from '../../util/browser/HumanTyping'
 import { waitForElementSmart } from '../../util/browser/SmartWait'
 
 type GoogleTrendsResponse = [
@@ -232,15 +233,18 @@ export class Search extends Workers {
 
                 let navigatedDirectly = false
                 try {
-                    // Try focusing and filling instead of clicking (more reliable on mobile)
+                    // FIXED: Use HumanTyping instead of .fill() to avoid bot detection
                     await box.focus({ timeout: 2000 }).catch(() => { /* ignore focus errors */ })
-                    await box.fill('')
                     await this.bot.utils.wait(200)
+
+                    // Clear field using keyboard (natural)
                     await searchPage.keyboard.down(platformControlKey)
                     await searchPage.keyboard.press('A')
                     await searchPage.keyboard.press('Backspace')
                     await searchPage.keyboard.up(platformControlKey)
-                    await box.type(query, { delay: 20 })
+
+                    // FIXED: Use HumanTyping for natural search query entry
+                    await HumanTyping.type(box, query, 1.5) // Fast typing (familiar search action)
                     await searchPage.keyboard.press('Enter')
                 } catch (typeErr) {
                     // As a robust fallback, navigate directly to the search results URL

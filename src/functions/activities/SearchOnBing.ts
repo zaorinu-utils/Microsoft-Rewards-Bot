@@ -3,6 +3,7 @@ import path from 'path'
 import type { Page } from 'playwright'
 
 import { DELAYS } from '../../constants'
+import { HumanTyping } from '../../util/browser/HumanTyping'
 import { Workers } from '../Workers'
 
 import { MorePromotion, PromotionalItem } from '../../interface/DashboardData'
@@ -27,9 +28,10 @@ export class SearchOnBing extends Workers {
             await this.bot.utils.wait(DELAYS.SEARCH_ON_BING_FOCUS)
             try {
                 await box.focus({ timeout: DELAYS.THIS_OR_THAT_START }).catch(() => { /* ignore */ })
-                await box.fill('')
                 await this.bot.utils.wait(DELAYS.SEARCH_ON_BING_FOCUS)
-                await page.keyboard.type(query, { delay: DELAYS.TYPING_DELAY })
+
+                // FIXED: Use HumanTyping instead of .fill() to avoid bot detection
+                await HumanTyping.type(box, query, 1.5) // Fast typing (familiar search action)
                 await page.keyboard.press('Enter')
             } catch {
                 const url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`

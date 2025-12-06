@@ -2633,17 +2633,17 @@ export class AccountCreator {
         log(false, 'CREATOR', `Normal click failed: ${error1}`, 'log', 'yellow')
       }
 
-      // Strategy 2: Force click (if cookie banner blocks)
+      // Strategy 2: JavaScript click (avoid force: true - bot detection risk)
       if (!clickSuccess) {
         try {
-          log(false, 'CREATOR', '🔄 Retrying with force click...', 'log', 'cyan')
-          await getStartedButton.click({ force: true, timeout: 5000 })
+          log(false, 'CREATOR', '🔄 Retrying with JavaScript click...', 'log', 'cyan')
+          await getStartedButton.evaluate((el: HTMLElement) => el.click())
           await this.humanDelay(2000, 3000)
           await this.waitForPageStable('AFTER_GET_STARTED_RETRY', 5000)
           clickSuccess = true
-          log(false, 'CREATOR', '✅ Clicked "Get started" with force', 'log', 'green')
+          log(false, 'CREATOR', '✅ Clicked "Get started" with JS', 'log', 'green')
         } catch (error2) {
-          log(false, 'CREATOR', `Force click failed: ${error2}`, 'log', 'yellow')
+          log(false, 'CREATOR', `JS click failed: ${error2}`, 'log', 'yellow')
         }
       }
 
